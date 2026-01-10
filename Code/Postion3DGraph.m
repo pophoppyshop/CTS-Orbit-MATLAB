@@ -12,11 +12,11 @@ accPos = NaN(countSize, 3);
 for i = 1:countSize
     % Only get info if needed (runs faster)
     if ~isnan(accCount(i))
-        posVel = states(CtS, timeIntervals(i, 1), "CoordinateFrame", "ecef");
+        pos = states(CtS, timeIntervals(i, 1), "CoordinateFrame", "ecef");
 
-        posVel = transpose(posVel);
+        pos = transpose(pos);
 
-        accPos(i, :) = posVel(1, :);
+        accPos(i, :) = pos(1, :);
     end
 end
 

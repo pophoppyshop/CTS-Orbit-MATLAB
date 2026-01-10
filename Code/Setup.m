@@ -18,11 +18,11 @@ trueAnomaly = 1.81165e-15;
 CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
     RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb");
 
-% Initialize constellations
+% Initialize constellations (3 things for each constellation)
 const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
 const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
-const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
-const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
+%const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
+%const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
 
 % Rothney ground station
 name = "Rothney";
@@ -50,9 +50,9 @@ accCount = [accCount; accessStatus(ac2)];
 %accCount = [accCount; accessStatus(ac3)];
 %accCount = [accCount; accessStatus(ac4)];
 
-% Collapse into one row by adding
-accCount = sum(accCount, 1);
-accCount = transpose(accCount);
+% Collapse into one row by adding (Commented out for error calc)
+%accCount = sum(accCount, 1);
+%accCount = transpose(accCount);
 
 % All sample time intervals for sim
 timeIntervals = startTime : seconds(sampleTime) : stopTime;
