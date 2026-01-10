@@ -56,6 +56,7 @@ ylabel('Duration of intervals (minutes)');
 title('Duration of Intervals Where Satellite Count is Below 5 VS Latitude');
 grid on;
 
+% Average and standard deviation
 average = mean(durations(:, 1), 'omitnan');
 standardDev = std(durations(:, 1), 'omitnan');
 

@@ -21,6 +21,8 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
 % Initialize constellations
 const1 = satellite(sc, "XML/glo.xml");
 const2 = satellite(sc, "XML/gps.xml");
+const3 = satellite(sc, "XML/galileo.xml");
+const4 = satellite(sc, "XML/beidou.xml");
 
 % Rothney ground station
 name = "Rothney";
@@ -35,6 +37,8 @@ camSensor = conicalSensor(g, MaxViewAngle=100, MountingAngles=[0;-85;0]); % yaw,
 
 ac = access(camSensor, const1);
 ac2 = access(camSensor, const2);
+%ac3 = access(camSensor, const3);
+%ac4 = access(camSensor, const4);
 
 % Visualize field of view of sensor
 %satelliteScenarioViewer(sc);               Uncomment to run sim
@@ -43,6 +47,8 @@ fieldOfView(camSensor);
 % Get number of accessed satellites in each sample time
 accCount = accessStatus(ac);
 accCount = [accCount; accessStatus(ac2)];
+%accCount = [accCount; accessStatus(ac3)];
+%accCount = [accCount; accessStatus(ac4)];
 
 % Collapse into one row by adding
 accCount = sum(accCount, 1);
