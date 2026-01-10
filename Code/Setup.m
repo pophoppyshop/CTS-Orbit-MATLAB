@@ -19,10 +19,10 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
     RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb");
 
 % Initialize constellations
-const1 = satellite(sc, "XML/glo.xml");
-const2 = satellite(sc, "XML/gps.xml");
-const3 = satellite(sc, "XML/galileo.xml");
-const4 = satellite(sc, "XML/beidou.xml");
+const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
+const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
+const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
+const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
 
 % Rothney ground station
 name = "Rothney";

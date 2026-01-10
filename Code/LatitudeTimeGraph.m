@@ -34,12 +34,12 @@ end
 figure
 scatter(accLat(:,1), accCount(:,1), "o")
 xlim([-100 100])
-ylim([5 35])
+ylim([0 5])
 xlabel('Latitude (degrees)');
 ylabel('Access Count');
 title('Satellite Access Count Below 5 VS Latitude');
 grid on;
 
-clearvars -except average standardDev
+%clearvars -except average standardDev
 
 %play(sc);              Uncomment to run sim
