@@ -1,7 +1,7 @@
 % Make sure you have Setup.m in the same folder
 Setup;
 
-% Filter for counts under 5
+% Filter for counts under 5 (Make sure accCount is collapsed in setup)
 accCount(accCount >= 5, 1) = NaN;
 
 countSize = numel(accCount);

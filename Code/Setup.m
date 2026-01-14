@@ -3,7 +3,7 @@ close all;
 
 % Init scenario
 startTime = datetime(2025,2,1,0,0,0);
-stopTime = startTime + hours(168);
+stopTime = startTime + hours(1);
 sampleTime = 60;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
@@ -19,10 +19,10 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
     RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb");
 
 % Initialize constellations (3 things for each constellation)
-const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
-const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
-%const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
-%const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
+const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
+const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
+%const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
+%const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
 
 % Rothney ground station
 name = "Rothney";
@@ -50,7 +50,7 @@ accCount = [accCount; accessStatus(ac2)];
 %accCount = [accCount; accessStatus(ac3)];
 %accCount = [accCount; accessStatus(ac4)];
 
-% Collapse into one row by adding (Commented out for error calc)
+% Collapse into one row by adding (Commented out ONLY for testing Error.m)
 %accCount = sum(accCount, 1);
 %accCount = transpose(accCount);
 
