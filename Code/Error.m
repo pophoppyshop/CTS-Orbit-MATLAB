@@ -68,6 +68,7 @@ for i = 1:countSize
     accLat(i) = lonlat(1);
 end
 
+% Graph error VS latitude
 figure
 plot(accLat(:,1), processedData)
 ylim([1 3])

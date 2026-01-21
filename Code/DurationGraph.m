@@ -9,15 +9,12 @@ countSize = numel(accCount);
 % Contains durations of counts below 5
 % 1st col is start sample time, 2nd col contains duration
 durations = NaN(countSize, 1);
-current = NaN;
-old = NaN;
 startIndex = 1;     % Start time for each interval
 
 for i = 1:countSize
-    current = accCount(i);
-
-    if ~isnan(current)
-        if isnan(old)
+    if ~isnan(accCount(i))
+        % Check previous 
+        if isnan(accCount(i - 1))
             % Start new count for an interval
             startIndex = i;
             
@@ -27,8 +24,6 @@ for i = 1:countSize
             durations(startIndex, 1) = durations(startIndex, 1) + 1;
         end
     end
-
-    old = current;
 end
 
 % Get all latitudes for each sample time

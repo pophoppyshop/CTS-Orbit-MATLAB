@@ -21,8 +21,8 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
 % Initialize constellations (3 things for each constellation)
 const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
 const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
-%const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
-%const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
+const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
+const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
 
 % Rothney ground station
 name = "Rothney";
@@ -37,8 +37,8 @@ camSensor = conicalSensor(g, MaxViewAngle=100, MountingAngles=[0;-85;0]); % yaw,
 
 ac = access(camSensor, const1);
 ac2 = access(camSensor, const2);
-%ac3 = access(camSensor, const3);
-%ac4 = access(camSensor, const4);
+ac3 = access(camSensor, const3);
+ac4 = access(camSensor, const4);
 
 % Visualize field of view of sensor
 %satelliteScenarioViewer(sc);               Uncomment to run sim
@@ -47,12 +47,12 @@ fieldOfView(camSensor);
 % Get number of accessed satellites in each sample time
 accCount = accessStatus(ac);
 accCount = [accCount; accessStatus(ac2)];
-%accCount = [accCount; accessStatus(ac3)];
-%accCount = [accCount; accessStatus(ac4)];
+accCount = [accCount; accessStatus(ac3)];
+accCount = [accCount; accessStatus(ac4)];
 
 % Collapse into one row by adding (Commented out ONLY for testing Error.m)
-%accCount = sum(accCount, 1);
-%accCount = transpose(accCount);
+accCount = sum(accCount, 1);
+accCount = transpose(accCount);
 
 % All sample time intervals for sim
 timeIntervals = startTime : seconds(sampleTime) : stopTime;
