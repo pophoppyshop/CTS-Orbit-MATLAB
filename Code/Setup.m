@@ -1,3 +1,4 @@
+%% 
 clear
 close all;
 
@@ -18,7 +19,7 @@ trueAnomaly = 1.81165e-15;
 CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
     RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb");
 
-% Initialize constellations (3 things for each constellation)
+% Initialize constellations (2 things for each constellation)
 const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
 const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
 const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
@@ -31,28 +32,22 @@ lon = dms2degrees([-114 17 28.1]);
 
 gs = groundStation(sc,"Name",name,"Latitude",lat, "Longitude", lon);
 
-% Conical sensor                               
-g = gimbal(CtS);    
-camSensor = conicalSensor(g, MaxViewAngle=100, MountingAngles=[0;-85;0]); % yaw, pitch, roll
-
-ac = access(camSensor, const1);
-ac2 = access(camSensor, const2);
-ac3 = access(camSensor, const3);
-ac4 = access(camSensor, const4);
+% Conical sensor   
+camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=100, MountingAngles=[0;-85;0]); % yaw, pitch, roll
 
 % Visualize field of view of sensor
-%satelliteScenarioViewer(sc);               Uncomment to run sim
+%satelliteScenarioViewer(sc);               %Uncomment to run sim
 fieldOfView(camSensor);
 
 % Get number of accessed satellites in each sample time
-accCount = accessStatus(ac);
-accCount = [accCount; accessStatus(ac2)];
-accCount = [accCount; accessStatus(ac3)];
-accCount = [accCount; accessStatus(ac4)];
+accCount = accessStatus(access(camSensor, const1));
+accCount = [accCount; accessStatus(access(camSensor, const2))];
+accCount = [accCount; accessStatus(access(camSensor, const3))];
+accCount = [accCount; accessStatus(access(camSensor, const4))];
 
-% Collapse into one row by adding (Commented out ONLY for testing Error.m)
-accCount = sum(accCount, 1);
-accCount = transpose(accCount);
+% Collapse into one row by adding (Commented out ONLY for testing Error.m & Occulation.m)
+%accCount = sum(accCount, 1);
+%accCount = transpose(accCount);
 
 % All sample time intervals for sim
 timeIntervals = startTime : seconds(sampleTime) : stopTime;
