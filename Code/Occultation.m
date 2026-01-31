@@ -2,7 +2,7 @@
 Setup;
 
 % 360 view ----------------
-view360 = conicalSensor([const1 const2 const3 const4], 'Name', "360View", MaxViewAngle=179); % yaw, pitch, roll
+view360 = conicalSensor(allConsts, 'Name', "360View", MaxViewAngle=179); % yaw, pitch, roll
 
 ac = access(view360, CtS);
 
@@ -37,6 +37,7 @@ for i = 1:accessSize(1,1)
     end
 end
 
+% Plot number of occultations over time
 figure 
 plot(timeIntervals(:,1), occultations(:,1))
 xlabel('Time (UTC)');

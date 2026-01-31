@@ -5,7 +5,7 @@ close all;
 % Init scenario
 startTime = datetime(2025,2,1,0,0,0);
 stopTime = startTime + hours(168);
-sampleTime = 60;    % determines length of time intervals (seconds)
+sampleTime = 10;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
 % Initialize CtS satellite with orbit parameters
@@ -19,11 +19,14 @@ trueAnomaly = 1.81165e-15;
 CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
     RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb");
 
-% Initialize constellations (2 things for each constellation)
-const1 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
-const2 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
-const3 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
-const4 = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
+% Initialize constellations
+glo = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/glo.xml");
+gps = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/gps.xml");
+beidou = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/beidou.xml");
+galileo = satellite(sc, "/MATLAB Drive/CtS/Orbit Sims/CTS-Orbit-MATLAB/XML/galileo.xml");
+
+% Remove satellites if not testing them
+allConsts = [glo gps];
 
 % Rothney ground station
 name = "Rothney";
@@ -40,10 +43,7 @@ camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=100, MountingAngl
 fieldOfView(camSensor);
 
 % Get number of accessed satellites in each sample time
-accCount = accessStatus(access(camSensor, const1));
-accCount = [accCount; accessStatus(access(camSensor, const2))];
-accCount = [accCount; accessStatus(access(camSensor, const3))];
-accCount = [accCount; accessStatus(access(camSensor, const4))];
+accCount = accessStatus(access(camSensor, allConsts));
 
 % Collapse into one row by adding (Commented out ONLY for testing Error.m & Occulation.m)
 %accCount = sum(accCount, 1);
