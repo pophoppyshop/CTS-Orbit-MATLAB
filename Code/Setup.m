@@ -1,4 +1,3 @@
-%% 
 clear
 close all;
 
@@ -39,7 +38,7 @@ gs = groundStation(sc,"Name",name,"Latitude",lat, "Longitude", lon);
 camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=100, MountingAngles=[0;-85;0]); % yaw, pitch, roll
 
 % Visualize field of view of sensor
-satelliteScenarioViewer(sc);               %Uncomment to run sim
+%satelliteScenarioViewer(sc);               %Uncomment to run sim
 fieldOfView(camSensor);
 
 % Get number of accessed satellites in each sample time

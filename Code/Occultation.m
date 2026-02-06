@@ -11,6 +11,7 @@ accCount360 = accessStatus(ac);
 
 accessSize = size(accCount); % [rows cols]
 occultations = NaN(accessSize(1,2), 1);
+occultationLatLon = NaN(accessSize(1,2), 2);
 
 % Iterate through each element
 for i = 1:accessSize(1,1)
@@ -26,6 +27,19 @@ for i = 1:accessSize(1,1)
         % both satellite view and 360 view
         if (currentCount >= 5 && accCount(i,j) == 1 && accCount(i, j + 1) == 0 && ...
                 accCount360(i, j) == 1 && accCount360(i, j + 1) == 0)
+            CtSLatLon = states(CtS, timeIntervals(i, 1), "CoordinateFrame", "geographic");
+            otherLatLon = states(allConsts(1, i), "CoordinateFrame", 'geographic');
+
+            % acos(r / distance from center to CtS)
+            occultAngle = acos(earthRadius / (CtSLatLon(3, 1) + earthRadius));
+
+            % Get angle difference from CtS to constellation sat
+            angleDiff = [otherLatLon(1) - CtSLatLon(1, 1),  otherLatLon(2) - CtSLatLon(2, 1)];
+            angleMagnitude = norm(angleDiff);
+
+            % Get lat and lon of occultation
+            occultationLatLon(j, 1) = occultAngle * (angleDiff(1) / angleMagnitude) + CtSLatLon(1,1);
+            occultationLatLon(j, 2) = occultAngle * (angleDiff(2) / angleMagnitude) +  CtSLatLon(2,1);
 
             % Add to number of occultations
             if isnan(occultations(j, 1))
@@ -36,6 +50,16 @@ for i = 1:accessSize(1,1)
         end
     end
 end
+
+occultationLatLon = occultationLatLon(all(~isnan(occultationLatLon), 2), :);
+
+% Plot positions of occultations
+figure 
+scatter(occultationLatLon(:,2), occultationLatLon(:,1))
+xlabel('Longitude (deg)');
+ylabel('Latitude (deg)');
+title('Longitude and Latitudes of Occultations');
+grid on;
 
 % Plot number of occultations over time
 figure 
