@@ -11,9 +11,13 @@ accCount360 = accessStatus(ac);
 
 accessSize = size(accCount); % [rows cols]
 occultations = NaN(accessSize(1,2), 1);
-occultationLatLon = NaN(accessSize(1,2), 2);
+occultationLatLon = NaN(accessSize(1,2), 3);
 
-% Iterate through each element
+% ecef coordinate system changes with time
+ctsPos = states(CtS, "CoordinateFrame", "ecef");
+constPos = states(allConsts, "CoordinateFrame", 'ecef');
+
+% Iterate through each element (i satellite, j time)
 for i = 1:accessSize(1,1)
     for j = 1:accessSize(1,2)
         currentCount = sum(accCount(:,j));
@@ -27,20 +31,21 @@ for i = 1:accessSize(1,1)
         % both satellite view and 360 view
         if (currentCount >= 5 && accCount(i,j) == 1 && accCount(i, j + 1) == 0 && ...
                 accCount360(i, j) == 1 && accCount360(i, j + 1) == 0)
-            CtSLatLon = states(CtS, timeIntervals(i, 1), "CoordinateFrame", "geographic");
-            otherLatLon = states(allConsts(1, i), "CoordinateFrame", 'geographic');
+            % Get 3D positions of both sats
+            currentCtSPos = ctsPos(:, j);
+            currentOtherPos = constPos(:, j, i);
 
-            % acos(r / distance from center to CtS)
-            occultAngle = acos(earthRadius / (CtSLatLon(3, 1) + earthRadius));
+            % Get unit vector between sats
+            unitVector = currentOtherPos - currentCtSPos;
+            unitVector = unitVector / norm(unitVector);
 
-            % Get angle difference from CtS to constellation sat
-            angleDiff = [otherLatLon(1) - CtSLatLon(1, 1),  otherLatLon(2) - CtSLatLon(2, 1)];
-            angleMagnitude = norm(angleDiff);
+            % Get magnitude of vector between CtS and occulation
+            magnitude = sqrt(earthRadius^2 + norm(currentCtSPos)^2);
 
-            % Get lat and lon of occultation
-            occultationLatLon(j, 1) = occultAngle * (angleDiff(1) / angleMagnitude) + CtSLatLon(1,1);
-            occultationLatLon(j, 2) = occultAngle * (angleDiff(2) / angleMagnitude) +  CtSLatLon(2,1);
+            occulationPos = transpose(currentCtSPos + magnitude * unitVector);
 
+            occultationLatLon(j, :) = ecef2lla(occulationPos); % Convert position to latitude and longitude
+            
             % Add to number of occultations
             if isnan(occultations(j, 1))
                 occultations(j, 1) = 1;
@@ -54,21 +59,23 @@ end
 occultationLatLon = occultationLatLon(all(~isnan(occultationLatLon), 2), :);
 
 % Plot positions of occultations
+load coastlines
+
 figure 
-scatter(occultationLatLon(:,2), occultationLatLon(:,1))
-xlabel('Longitude (deg)');
-ylabel('Latitude (deg)');
-title('Longitude and Latitudes of Occultations');
-grid on;
+worldmap('World')
+plotm(coastlat, coastlon, "g")
+plotm(occultationLatLon(:,1), occultationLatLon(:,2), ".")
+title('Longitude and Latitudes of Occultations')
+grid on
 
 % Plot number of occultations over time
 figure 
 plot(timeIntervals(:,1), occultations(:,1))
-xlabel('Time (UTC)');
-ylabel('Number of Occultation');
+xlabel('Time (UTC)')
+ylabel('Number of Occultation')
 ylim([0 7])
-title('Number of Occultations Over Time');
-grid on;
+title('Number of Occultations Over Time')
+grid on
 
 % Remove NaN values
 occultations = occultations(~isnan(occultations));
