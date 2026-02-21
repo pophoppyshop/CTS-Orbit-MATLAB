@@ -3,7 +3,7 @@ close all;
 
 % Init scenario
 startTime = datetime(2025,2,1,0,0,0);
-stopTime = startTime + hours(24);
+stopTime = startTime + hours(2/60);
 sampleTime = 10;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
