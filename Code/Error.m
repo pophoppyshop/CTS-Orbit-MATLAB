@@ -61,11 +61,10 @@ title("Errors in Satellite Position Over Time")
 % Get all latitudes for each sample time-
 countSize = numel(timeIntervals);
 accLat = NaN(countSize, 1);
+latlon = states(CtS, "CoordinateFrame", "geographic");
 
 for i = 1:countSize
-    lonlat = states(CtS, timeIntervals(i, 1), "CoordinateFrame", "geographic");
-
-    accLat(i) = lonlat(1);
+    accLat(i) = latlon(1,i);
 end
 
 % Graph error VS latitude

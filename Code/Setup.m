@@ -3,8 +3,8 @@ close all;
 
 % Init scenario
 startTime = datetime(2025,2,1,0,0,0);
-stopTime = startTime + hours(2/60);
-sampleTime = 10;    % determines length of time intervals (seconds)
+stopTime = startTime + hours(168); % 168 hours for a week
+sampleTime = 60;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
 % Initialize CtS satellite with orbit parameters
@@ -35,18 +35,18 @@ lon = dms2degrees([-114 17 28.1]);
 gs = groundStation(sc,"Name",name,"Latitude",lat, "Longitude", lon);
 
 % Conical sensor   
-camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=100, MountingAngles=[0;-85;0]); % yaw, pitch, roll
+camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=120, MountingAngles=[0;-180;0]); % yaw, pitch, roll
 
 % Visualize field of view of sensor
-%satelliteScenarioViewer(sc);               %Uncomment to run sim
+satelliteScenarioViewer(sc);               %Uncomment to run sim
 fieldOfView(camSensor);
 
 % Get number of accessed satellites in each sample time
 accCount = accessStatus(access(camSensor, allConsts));
 
 % Collapse into one row by adding (Commented out ONLY for testing Error.m & Occulation.m)
-%accCount = sum(accCount, 1);
-%accCount = transpose(accCount);
+accCount = sum(accCount, 1);
+accCount = transpose(accCount);
 
 % All sample time intervals for sim
 timeIntervals = startTime : seconds(sampleTime) : stopTime;

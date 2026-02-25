@@ -13,20 +13,20 @@ ylabel('Access Count');
 title('Satellite Access Count Over Time');
 grid on;
 
-% Filter for counts under 5 (comment this if no filter)
-accCount(accCount >= 5, 1) = NaN;
+% Filter for counts under 4 (comment this if no filter)
+accCount(accCount >= 4, 1) = NaN;
 
 countSize = numel(accCount);
 
 % Get all latitudes for each sample time
 accLat = NaN(countSize, 1);
 
+lonlat = states(CtS, "CoordinateFrame", "geographic");
+
 for i = 1:countSize
     % Only get info if needed (runs faster)
     if ~isnan(accCount(i))
-        lonlat = states(CtS, timeIntervals(i, 1), "CoordinateFrame", "geographic");
-    
-        accLat(i) = lonlat(1);
+        accLat(i) = lonlat(1,i);
     end
 end
 
@@ -34,12 +34,12 @@ end
 figure
 scatter(accLat(:,1), accCount(:,1), "o")
 xlim([-100 100])
-ylim([0 5])
+ylim([1 4])
 xlabel('Latitude (degrees)');
 ylabel('Access Count');
-title('Satellite Access Count Below 5 VS Latitude');
+title('Satellite Access Count Below 4 VS Latitude');
 grid on;
 
-%clearvars -except average standardDev
+clearvars -except average standardDev
 
 %play(sc);              Uncomment to run sim

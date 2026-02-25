@@ -2,11 +2,11 @@
 Setup;
 
 % Filter for counts under 5 (Make sure accCount is collapsed in setup)
-accCount(accCount >= 5, 1) = NaN;
+accCount(accCount >= 4, 1) = NaN;
 
 countSize = numel(accCount);
 
-% Contains durations of counts below 5
+% Contains durations of counts below 4
 % 1st col is start sample time, 2nd col contains duration
 durations = NaN(countSize, 1);
 startIndex = 1;     % Start time for each interval
@@ -48,11 +48,15 @@ xlim([-100 100])
 ylim([0 9])
 xlabel('Latitude (degrees)');
 ylabel('Duration of intervals (minutes)');
-title('Duration of Intervals Where Satellite Count is Below 5 VS Latitude');
+title('Duration of Intervals Where Satellite Count is Below 4 VS Latitude');
 grid on;
 
 % Average and standard deviation
 average = mean(durations(:, 1), 'omitnan');
 standardDev = std(durations(:, 1), 'omitnan');
 
-clearvars -except average standardDev
+accCount = rmmissing(accCount);
+
+percentage = numel(accCount) / countSize;
+
+clearvars -except average standardDev percentage

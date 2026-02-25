@@ -1,6 +1,34 @@
 clear
 close all
 
+% Init scenario
+startTime = datetime(2025,2,1,0,0,0);
+stopTime = startTime + hours(128);
+sampleTime = 10;    % determines length of time intervals (seconds)
+sc = satelliteScenario(startTime,stopTime,sampleTime);
+
+% Initialize CtS satellite with orbit parameters
+semiMajorAxis = 6950440;
+eccentricity = 1e-6;
+inclination = 98;
+RAAN = 135.58;
+argOfPeriapsis = 0;
+trueAnomaly = 1.81165e-15;
+
+CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
+    RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb");
+
+% Conical sensor   
+camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
+
+% Visualize field of view of sensor
+%satelliteScenarioViewer(sc);               % Uncomment to run sim
+fieldOfView(camSensor);
+
+% Rothney station
+gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
+ac = access(camSensor, gs);
+
 % Plot altitude vs dot diameter
 altitudes = 0:0.1:600;
 dotDiameters =  2 * tand(7/2) * altitudes;
@@ -14,7 +42,7 @@ ylabel("Dot Diameter (km)")
 figure
 hold on
 
-inputPower = 10:10:100; 
+inputPower = 10:10:100; % Input powers
 
 for power = inputPower
     outputPower = (power * 0.6 * 0.2 ^ 2) ./ (dotDiameters*1000.^2);
