@@ -3,8 +3,8 @@ close all
 
 % Init scenario
 startTime = datetime(2025,2,1,0,0,0);
-stopTime = startTime + hours(128);
-sampleTime = 10;    % determines length of time intervals (seconds)
+stopTime = startTime + hours(1700);
+sampleTime = 30;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
 % Initialize CtS satellite with orbit parameters
@@ -29,6 +29,15 @@ fieldOfView(camSensor);
 gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
 ac = access(camSensor, gs);
 
+% All sample time intervals for sim
+timeIntervals = startTime : seconds(sampleTime) : stopTime;
+accessInterval = double(accessStatus(ac));
+
+accessInterval(accessInterval == 0) = NaN;
+
+scatter(timeIntervals(1,:), accessInterval(1,:));
+
+%{
 % Plot altitude vs dot diameter
 altitudes = 0:0.1:600;
 dotDiameters =  2 * tand(7/2) * altitudes;
@@ -71,7 +80,7 @@ ylabel("P_r_x / P_t_x")
 xlabel("Altitudes (km)")
 
 
-%{
+
 % Init scenario
 startTime = datetime(2025,2,1,0,0,0);
 stopTime = startTime + hours(2/60);
