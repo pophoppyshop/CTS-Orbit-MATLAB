@@ -2,9 +2,9 @@ clear
 close all
 
 % Init scenario
-startTime = datetime(2025,2,1,0,0,0);
-stopTime = startTime + hours(1700);
-sampleTime = 30;    % determines length of time intervals (seconds)
+startTime = datetime(2025,3,24,0,0,0);
+stopTime = startTime + hours(270);
+sampleTime = 60;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
 % Initialize CtS satellite with orbit parameters
@@ -22,12 +22,14 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
 camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
 
 % Visualize field of view of sensor
-%satelliteScenarioViewer(sc);               % Uncomment to run sim
+satelliteScenarioViewer(sc);               % Uncomment to run sim
 fieldOfView(camSensor);
 
 % Rothney station
 gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
 ac = access(camSensor, gs);
+
+play(sc);
 
 % All sample time intervals for sim
 timeIntervals = startTime : seconds(sampleTime) : stopTime;
@@ -35,7 +37,13 @@ accessInterval = double(accessStatus(ac));
 
 accessInterval(accessInterval == 0) = NaN;
 
+title("Access Intervals")
 scatter(timeIntervals(1,:), accessInterval(1,:));
+ylabel("Number of satellites in contact (1 cause it's only CTS)")
+xlabel("Time (in 30s intervals)")
+
+[position, velocity] = states(CtS, datetime(2025,3,24,3,54,24), "CoordinateFrame", "ecef");
+groundSpeed = vecnorm(velocity());  % Magnitude of velocity vector
 
 %{
 % Plot altitude vs dot diameter
