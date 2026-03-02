@@ -4,7 +4,7 @@ close all
 % Init scenario
 startTime = datetime(2025,3,24,0,0,0);
 stopTime = startTime + hours(270);
-sampleTime = 60;    % determines length of time intervals (seconds)
+sampleTime = 30;    % determines length of time intervals (seconds)
 sc = satelliteScenario(startTime,stopTime,sampleTime);
 
 % Initialize CtS satellite with orbit parameters
@@ -22,14 +22,12 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
 camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
 
 % Visualize field of view of sensor
-satelliteScenarioViewer(sc);               % Uncomment to run sim
+%satelliteScenarioViewer(sc);               % Uncomment to run sim
 fieldOfView(camSensor);
 
 % Rothney station
 gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
 ac = access(camSensor, gs);
-
-play(sc);
 
 % All sample time intervals for sim
 timeIntervals = startTime : seconds(sampleTime) : stopTime;
