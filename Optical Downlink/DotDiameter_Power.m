@@ -10,7 +10,7 @@ sc = satelliteScenario(startTime,stopTime,sampleTime);
 % Initialize CtS satellite with orbit parameters
 semiMajorAxis = 6950440;
 eccentricity = 1e-6;
-inclination = 98;
+inclination = 98; 
 RAAN = 135.58;
 argOfPeriapsis = 0;
 trueAnomaly = 1.81165e-15;
