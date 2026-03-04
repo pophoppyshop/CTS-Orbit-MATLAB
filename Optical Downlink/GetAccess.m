@@ -56,6 +56,8 @@ for i = 0:ONE_ITERATION_HR:TOTAL_TIME_HR
                 % Add any previous cell
                 if numel(currentCell) ~= 0
                     durations(currentIndex, :) = currentCell;
+
+                    currentIndex = currentIndex + 1;
                 end
 
                 currentCell = {currentDate + seconds(j * sampleTime), 1};
@@ -66,7 +68,7 @@ for i = 0:ONE_ITERATION_HR:TOTAL_TIME_HR
         end
     end
 
-    currentDate = currentDate + accessSize;
+    currentDate = currentDate + seconds(accessSize);
 
     % Update true anomaly
     elements = orbitalElements(CtS);
