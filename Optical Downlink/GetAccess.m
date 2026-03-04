@@ -14,7 +14,7 @@ argOfPeriapsis = 0;
 trueAnomaly = 1.81165e-15; % Will change during orbit
 
 % 1st column contains date, 2nd contains duration
-durations = table('Size', [10000, 2], 'VariableTypes', ...
+durations = table('Size', [100, 2], 'VariableTypes', ...
     {'datetime', 'int8'}, 'VariableNames', {'Date (UTC)', 'Duration (30s)'});
 
 
