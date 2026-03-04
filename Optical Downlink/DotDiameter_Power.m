@@ -22,7 +22,7 @@ CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
 camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
 
 % Visualize field of view of sensor
-%satelliteScenarioViewer(sc);               % Uncomment to run sim
+satelliteScenarioViewer(sc);               % Uncomment to run sim
 fieldOfView(camSensor);
 
 % Rothney station
