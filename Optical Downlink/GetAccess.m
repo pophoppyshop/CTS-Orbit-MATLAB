@@ -14,7 +14,7 @@ argOfPeriapsis = 0;
 trueAnomaly = 1.81165e-15; % Will change during orbit
 
 % 1st column contains date, 2nd contains duration
-durations = table('Size', [2, 2], 'VariableTypes', ...
+durations = table('Size', [10000, 2], 'VariableTypes', ...
     {'datetime', 'int8'}, 'VariableNames', {'Date (UTC)', 'Duration (30s)'});
 
 
@@ -22,7 +22,7 @@ currentCell = {};
 currentCellDate = datetime(2025,3,24,0,0,0);
 currentIndex = 1;
 
-for i = 0:ONE_ITERATION_HR:TOTAL_TIME_HR
+for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
     % Init scenario
     stopTime = currentDate + hours(ONE_ITERATION_HR);
     sc = satelliteScenario(currentDate,stopTime,sampleTime);
@@ -50,7 +50,7 @@ for i = 0:ONE_ITERATION_HR:TOTAL_TIME_HR
     % Add all durations
     for j = 1:accessSize
         % If current entry is true
-        if accessIntervals(j)
+        if accessIntervals(j) && j > 1
             % If previous entry is false, start new duration
             if ~accessIntervals(j - 1)
                 % Add any previous cell
