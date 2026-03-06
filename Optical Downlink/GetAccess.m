@@ -2,8 +2,9 @@ clear
 close all
 
 TOTAL_TIME_HR = 8760;
-ONE_ITERATION_HR = 21;
-sampleTime = 0.5;        % determines length of time intervals (seconds)
+ONE_ITERATION_HR = 24;
+SAMPLE_TIME = 0.5;        % determines length of time intervals (seconds)
+OUTPUT_FILE = "DurationsTable_1YR.csv";
 currentDate = datetime(2025,3,24,0,0,0); % Initial value is start
 
 semiMajorAxis = 6950440;
@@ -15,7 +16,7 @@ trueAnomaly = 1.81165e-15; % Will change during orbit
 
 % 1st column contains date, 2nd contains duration
 durations = table('Size', [100, 2], 'VariableTypes', ...
-    {'datetime', 'int8'}, 'VariableNames', {'Date (UTC)', 'Duration (30s)'});
+    {'datetime', 'int8'}, 'VariableNames', {'Start Date (UTC)', 'Duration (s)'});
 
 
 currentCell = {};
@@ -25,7 +26,7 @@ currentIndex = 1;
 for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
     % Init scenario
     stopTime = currentDate + hours(ONE_ITERATION_HR);
-    sc = satelliteScenario(currentDate,stopTime,sampleTime);
+    sc = satelliteScenario(currentDate,stopTime,SAMPLE_TIME);
 
     % Initialize CtS satellite with orbit parameters
     CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
@@ -60,7 +61,8 @@ for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
                     currentIndex = currentIndex + 1;
                 end
 
-                currentCell = {currentDate + seconds(j * sampleTime), 1};
+                currentCell = {currentDate + seconds(j * SAMPLE_TIME), 1};
+                
             % Add to current duration
             else
                 currentCell{1, 2} = currentCell{1, 2} + 1;
@@ -68,7 +70,7 @@ for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
         end
     end
 
-    currentDate = currentDate + seconds(accessSize);
+    currentDate = currentDate + seconds(accessSize * SAMPLE_TIME);
 
     % Update true anomaly
     elements = orbitalElements(CtS);
@@ -76,8 +78,20 @@ for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
     trueAnomaly = elements.TrueAnomaly;
 end
 
-% Last check to add cell to durations
+% Add last cell to durations
 durations(currentIndex, :) = currentCell;
+
+% Convert to seconds
+durations(:,2) = durations(:,2) .* SAMPLE_TIME;
+
+% Get average duration
+meanDuration = sum(durations(:, 2));
+meanDuration = meanDuration{1,1} / currentIndex;
+
+
+
+% Save the durations table to a CSV file
+writetable(durations(1:currentIndex, :), OUTPUT_FILE);
 
 
 
