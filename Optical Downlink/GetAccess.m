@@ -62,7 +62,7 @@ for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
                 end
 
                 currentCell = {currentDate + seconds(j * SAMPLE_TIME), 1};
-                
+
             % Add to current duration
             else
                 currentCell{1, 2} = currentCell{1, 2} + 1;
@@ -85,7 +85,7 @@ durations(currentIndex, :) = currentCell;
 durations(:,2) = durations(:,2) .* SAMPLE_TIME;
 
 % Get average duration
-meanDuration = sum(durations(:, 2));
+meanDuration = sum(durations(1:currentIndex, 2));
 meanDuration = meanDuration{1,1} / currentIndex;
 
 
