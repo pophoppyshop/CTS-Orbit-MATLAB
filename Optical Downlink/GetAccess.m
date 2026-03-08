@@ -2,7 +2,7 @@ clear
 close all
 
 TOTAL_TIME_HR = 8760;
-ONE_ITERATION_HR = 24;
+ONE_ITERATION_HR = 20;
 SAMPLE_TIME = 0.5;        % determines length of time intervals (seconds)
 OUTPUT_FILE = "DurationsTable_1YR.csv";
 currentDate = datetime(2025,3,24,0,0,0); % Initial value is start
@@ -12,38 +12,31 @@ eccentricity = 1e-6;
 inclination = 98; 
 RAAN = 135.58;
 argOfPeriapsis = 0;
-trueAnomaly = 1.81165e-15; % Will change during orbit
+trueAnomaly = 1.81165e-15;              % Will change during orbit
 
 % 1st column contains date, 2nd contains duration
 durations = table('Size', [100, 2], 'VariableTypes', ...
     {'datetime', 'int8'}, 'VariableNames', {'Start Date (UTC)', 'Duration (s)'});
 
-
 currentCell = {};
-currentCellDate = datetime(2025,3,24,0,0,0);
 currentIndex = 1;
 
+ % Init scenario
+stopTime = currentDate + hours(ONE_ITERATION_HR);
+sc = satelliteScenario(currentDate,stopTime,SAMPLE_TIME);
+
+% Visualize field of view of sensor
+% satelliteScenarioViewer(sc);               % Uncomment to open simulation
+% fieldOfView(camSensor);
+
+% Rothney station
+gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
+
+% Re-add satellite
+[ac, CtS] = AddSatellite(sc, semiMajorAxis, eccentricity, inclination, ...
+    RAAN, argOfPeriapsis, trueAnomaly, gs);
+
 for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
-    % Init scenario
-    stopTime = currentDate + hours(ONE_ITERATION_HR);
-    sc = satelliteScenario(currentDate,stopTime,SAMPLE_TIME);
-
-    % Initialize CtS satellite with orbit parameters
-    CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
-    RAAN, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb", ...
-    Name="CtS", OrbitPropagator="two-body-keplerian");
-
-    % Conical sensor   
-    camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
-    
-    % Visualize field of view of sensor
-    %satelliteScenarioViewer(sc);               % Uncomment to run sim
-    fieldOfView(camSensor);
-    
-    % Rothney station
-    gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
-    ac = access(camSensor, gs);
-
     % 1 x num of time intervals, contains boolean values
     accessIntervals = accessStatus(ac);
     accessSize = numel(accessIntervals);
@@ -71,11 +64,19 @@ for i = 0:1:(TOTAL_TIME_HR / ONE_ITERATION_HR)
     end
 
     currentDate = currentDate + seconds(accessSize * SAMPLE_TIME);
-
+    
     % Update true anomaly
-    elements = orbitalElements(CtS);
+    trueAnomaly = orbitalElements(CtS).TrueAnomaly;
 
-    trueAnomaly = elements.TrueAnomaly;
+    % Update scenario
+    sc.StartTime = currentDate;
+    sc.StopTime = currentDate + hours(ONE_ITERATION_HR);
+
+    delete(sc.Satellites)
+
+    % Re-add satellite
+    [ac, CtS] = AddSatellite(sc, semiMajorAxis, eccentricity, inclination, ...
+        RAAN, argOfPeriapsis, trueAnomaly, gs);
 end
 
 % Add last cell to durations
