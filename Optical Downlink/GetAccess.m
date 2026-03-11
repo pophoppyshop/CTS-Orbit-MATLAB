@@ -6,11 +6,12 @@ close all
 % Consider splitting the time interval into orbital periods so we know
 % true anomaly will be the same
 
+
 TOTAL_TIME_HR = 8760;
-ONE_ITERATION_HR = 20;
+ONE_ITERATION_HR = 10;    % Will be multiplied by the period of sat (n orbits)
 SAMPLE_TIME = 0.5;        % determines length of time intervals (seconds)
 OUTPUT_FILE = "DurationsTable_1YR_Test.csv";
-START_DATE = datetime(2025,3,24,0,0,0);  % Initial value
+START_DATE = datetime(2025,3,24,0,0,0);     % Initial value
 
 initialTableSize = 30;      % can adjust to speed up program
 
@@ -20,45 +21,48 @@ eccentricity = 1e-6;
 inclination = 98; 
 RAANi = 135.58;                         
 argOfPeriapsis = 0;
-trueAnomaly = 1.81165e-15;              % Will change during orbit
+trueAnomaly = 1.81165e-15;              
 
-% Visualize field of view of sensor (Uncomment to open simulation)
-% satelliteScenarioViewer(sc);     
-% fieldOfView(camSensor);
+% Init scenario
+sc = satelliteScenario(START_DATE,START_DATE,SAMPLE_TIME);
 
-parfor i = 0:(TOTAL_TIME_HR / ONE_ITERATION_HR)
-    % Init scenario
-    currentDate = START_DATE + i * hours(ONE_ITERATION_HR);    % One iteration in hours
+% Rothney station
+gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
+
+% Initialize CtS satellite with updated orbit parameters
+CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
+RAANi, argOfPeriapsis, trueAnomaly, Visual3DModel="NarrowBodyAirliner.glb", ...
+Name="CtS", OrbitPropagator="two-body-keplerian");
+
+ONE_ITERATION_HR = (CtS.orbitalElements.Period / 3600) * ONE_ITERATION_HR;
+
+% Conical sensor   
+camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
+ac = access(camSensor, gs);
+
+% Visualize field of view of sensor
+% satelliteScenarioViewer(sc);     Uncomment to show simulation
+fieldOfView(camSensor);
+
+% Holds all durations and start date
+durations = table('Size', [initialTableSize, 2], 'VariableTypes', ...
+    {'datetime', 'int8'}, 'VariableNames', {'Start Date (UTC)', 'Duration (s)'});
+currentIndex = 1;
+
+% Set up containers for data
+currentCell = {};
+
+for i = 0:round(TOTAL_TIME_HR / ONE_ITERATION_HR)
+    % Update time interval
+    currentDate = START_DATE + i * hours(ONE_ITERATION_HR);    
     stopTime = currentDate + hours(ONE_ITERATION_HR);
-    sc = satelliteScenario(currentDate,stopTime,SAMPLE_TIME);
 
-    % Rothney station
-    gs = groundStation(sc, Name="Rothney Station", Latitude=50.868, Longitude=-114.291);
-
-    % Get the current true anomaly
-    [r, v] = propagateOrbit(currentDate, semiMajorAxis, eccentricity, ...
-                inclination, RAANi, argOfPeriapsis, trueAnomaly);
-        
-    [a, ecc, incl, RAAN, argp, nu, truelon, arglat, lonper] = ijk2keplerian(r,v);
-
-    % Initialize CtS satellite with updated orbit parameters
-    CtS = satellite(sc, semiMajorAxis, eccentricity, inclination, ...
-    RAANi, argOfPeriapsis, nu, Visual3DModel="NarrowBodyAirliner.glb", ...
-    Name="CtS", OrbitPropagator="two-body-keplerian");
-    
-    % Conical sensor   
-    camSensor = conicalSensor(CtS, 'Name', "Antenna", MaxViewAngle=7, MountingAngles=[0;0;0]); % yaw, pitch, roll
-    ac = access(camSensor, gs);
+    sc.StartTime = currentDate;
+    sc.StopTime = stopTime;
 
     % 1 x num of time intervals, contains boolean values
     accessIntervals = accessStatus(ac);
     accessSize = numel(accessIntervals);
-
-    % Set up containers for data
-    currentCell = {};
-    tempData = table('Size', [initialTableSize, 2], 'VariableTypes', ...
-    {'datetime', 'int8'}, 'VariableNames', {'Start Date (UTC)', 'Duration (s)'});
-    currentIndex = 1;
 
     % Add all durations
     for j = 1:accessSize
@@ -69,7 +73,7 @@ parfor i = 0:(TOTAL_TIME_HR / ONE_ITERATION_HR)
                 
                 % Add any previous cell
                 if numel(currentCell) ~= 0
-                    tempData(currentIndex, :) = currentCell;
+                    durations(currentIndex, :) = currentCell;
 
                     currentIndex = currentIndex + 1;
                 end
@@ -85,38 +89,14 @@ parfor i = 0:(TOTAL_TIME_HR / ONE_ITERATION_HR)
 
     % Add last cell to durations if possible
     if (numel(currentCell) ~= 0)
-        tempData(currentIndex, :) = currentCell;
-    end
-
-    % Removes all missing entries
-    tempData = tempData(~ismissing(tempData(:,1)), :);
-
-    % Only write if there is atleast one entry
-    if (numel(tempData) ~= 0)
-        writetable(tempData, OUTPUT_FILE, 'WriteMode', 'append');
+        durations(currentIndex, :) = currentCell;
     end
 end
 
+% Removes all missing entries
+durations = durations(~ismissing(durations(:,1)), :); 
 
-%{
-% Convert to seconds
-durations(:,2) = durations(:,2) .* SAMPLE_TIME;
-
-% Get average duration
-meanDuration = sum(durations(1:currentIndex, 2));
-meanDuration = meanDuration{1,1} / currentIndex;
-
-
-
-% Save the durations table to a CSV file
-writetable(durations(1:currentIndex, :), OUTPUT_FILE);
-
-table('Size', [100, 2], 'VariableTypes', ...
-    {'datetime', 'int8'}, 'VariableNames', {'Start Date (UTC)', 'Duration (s)'})
-%}
-
-
-
-
-
-
+% Only write if there is atleast one entry
+if (numel(durations) ~= 0)
+    writetable(durations, OUTPUT_FILE);
+end
