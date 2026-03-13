@@ -10,8 +10,9 @@ durations(:,2) = durations(:,2) .* SAMPLE_TIME;
 
 scatter(durations{:, 1}, durations{:,2})
 title("Durations of access intervals over a year")
-xlabel("Date")
+xlabel("Date (UTC)")
 ylabel("Duration (s)")
+xlim([datetime(2025,3,24,0,0,0) datetime(2026,3,24,0,0,0)])
 ylim([0 (max(durations{:,2}) + 2)])
 
 % Get average duration
@@ -20,18 +21,26 @@ meanDuration = mean(durations(:,2));
 rows = size(durations, 1);
 
 % Get time between access intervals (days)
-timeBetweenAccess = zeros(rows - 1,1);
+timeBetweenAccess = table('Size', [rows - 1, 2], 'VariableTypes', ...
+    {'datetime', 'int16'}, 'VariableNames', {'Start Date (UTC)', 'Duration (s)'});
 
 for i = 1:(rows - 1)
     difference = durations(i + 1, 1) - durations(i, 1);
-    timeBetweenAccess(i, 1) = days(difference{1,1});
+
+    currentCell = {durations{i,1}, days(difference{1,1})};
+
+    timeBetweenAccess(i, :) = currentCell;
 end
 
 avgTimeBetween = mean(timeBetweenAccess);    % in days
 
+% Time between access Vs start date
 figure
-scatter(1:rows - 1, timeBetweenAccess(:,1))
+scatter(timeBetweenAccess{:,1}, timeBetweenAccess{:,2})
 title("Time Between Access Intervals")
-xlabel("Date")
+xlabel("Start date (UTC)")
 ylabel("Duration (days)")
-ylim([0 (max(timeBetweenAccess(:,1)) + 2)])
+xlim([datetime(2025,3,24,0,0,0) datetime(2026,3,24,0,0,0)])
+ylim([0 (max(timeBetweenAccess{:,2}) + 2)])
+
+% Time between access Vs
