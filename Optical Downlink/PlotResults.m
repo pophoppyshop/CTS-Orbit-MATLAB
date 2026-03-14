@@ -38,7 +38,7 @@ avgTimeBetween = mean(timeBetweenAccess);    % in days
 figure
 scatter(timeBetweenAccess{:,1}, timeBetweenAccess{:,2})
 title("Time Between Access Intervals")
-xlabel("Start date (UTC)")
+xlabel("Interval Number")
 ylabel("Duration (days)")
 xlim([datetime(2025,3,24,0,0,0) datetime(2026,3,24,0,0,0)])
 ylim([0 (max(timeBetweenAccess{:,2}) + 2)])
